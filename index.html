@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conecta - Networking B2B Local</title>
+  <style>
+    :root {
+      --ink: #2b1b1f;
+      --muted: #7a6d72;
+      --line: #eadedf;
+      --soft: #f8f5f3;
+      --white: #ffffff;
+
+      /* cores da logo */
+      --wine: #9b1238;
+      --wine-dark: #7d0f2d;
+      --gold: #d1951c;
+      --gold-dark: #b57d13;
+
+      /* substituições */
+      --teal: #9b1238;
+      --green: #b21c45;
+      --coral: #c84658;
+      --amber: #d1951c;
+      --blue: #c48a1c;
+      --violet: #8d2d48;
+
+      --shadow: 0 18px 60px rgba(112, 35, 52, 0.16);
+      --radius: 18px;
+      --phone-width: 390px;
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(155,18,56,0.15), transparent 30%),
+        radial-gradient(circle at right, rgba(209,149,28,0.15), transparent 30%),
+        linear-gradient(135deg, #fcfaf9, #f8f2f0);
+      color: var(--ink);
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .workspace {
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: var(--phone-width) minmax(360px, 1fr);
+      align-items: center;
+      gap: 28px;
+    }
+
+    .phone {
+      width: var(--phone-width);
+      height: min(844px, calc(100vh - 48px));
+      min-height: 720px;
+      border: 10px solid #111927;
+      border-radius: 44px;
+      background: var(--white);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .status-bar {
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.88);
+      position: relative;
+      z-index: 4;
+    }
+
+    .status-dots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dots span {
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #111927;
+      opacity: 0.82;
+    }
+
+    .app {
+      height: calc(100% - 30px);
+      position: relative;
+      background: var(--soft);
+      overflow: hidden;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--soft);
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    .screen-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 18px 96px;
+      scrollbar-width: none;
+    }
+
+    .screen-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      position: relative;
+      background: linear-gradient(135deg, var(--wine), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      box-shadow: 0 10px 30px rgba(155, 18, 56, 0.25);
+    }
+
+    .brand-mark::before {
+      content: "∞";
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .hero-photo {
+      min-height: 250px;
+      border-radius: 0 0 40px 40px;
+      background: linear-gradient(135deg, rgba(155,18,56,0.95), rgba(209,149,28,0.85));
+      padding: 24px;
+      display: flex;
+      align-items: flex-end;
+      color: white;
+    }
+
+    .hero-photo h1,
+    .hero-photo p {
+      margin: 0;
+    }
+
+    .hero-photo h1 {
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .hero-photo p {
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 310px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .login-panel {
+      padding: 20px 18px 96px;
+      overflow: auto;
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .intro-item {
+      min-height: 94px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .intro-item strong {
+      font-size: 13px;
+      line-height: 1.24;
+    }
+
+    .intro-item small {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .icon-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: var(--white);
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .ghost-btn,
+    .icon-btn,
+    .chip,
+    .filter-btn,
+    .nav-btn {
+      min-height: 40px;
+      border-radius: var(--radius);
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, color 160ms ease;
+    }
+
+    .primary-btn {
+      width: 100%;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--wine), var(--gold));
+      font-weight: 850;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(155, 18, 56, 0.2);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .secondary-btn {
+      width: 100%;
+      color: var(--ink);
+      background: var(--white);
+      border: 1px solid var(--line);
+      font-weight: 800;
+      border-radius: 16px;
+    }
+
+    .ghost-btn {
+      background: transparent;
+      color: var(--wine);
+      font-weight: 850;
+      padding: 0 10px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      display: grid;
+      place-items: center;
+      background: var(--white);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      flex: 0 0 40px;
+      border-radius: 12px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .app-header {
+      padding: 14px 18px 10px;
+      background: rgba(245, 247, 251, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(228, 233, 242, 0.78);
+      position: sticky;
+      top: 0;
+      z-index: 3;
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .location h2 {
+      font-size: 18px;
+      margin: 0;
+      line-height: 1.12;
+    }
+
+    .location small {
+      display: block;
+      color: var(--muted);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .search {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 0 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .segmented,
+    .filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+
+    .segmented::-webkit-scrollbar,
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
+
+    .segmented {
+      margin-top: 12px;
+    }
+
+    .filter-btn {
+      white-space: nowrap;
+      padding: 0 12px;
+      background: var(--white);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      font-size: 12px;
+      font-weight: 820;
+      border-radius: 30px;
+    }
+
+    .filter-btn.active {
+      color: var(--white);
+      background: var(--wine);
+      border-color: var(--wine);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 18px 0 10px;
+    }
+
+    .section-title h3 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .section-title span,
+    .mini-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .match-strip {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .match-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .match-card {
+      flex: 0 0 148px;
+      min-height: 182px;
+      border-radius: 20px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(24, 33, 47, 0.06);
+    }
+
+    .photo {
+      height: 82px;
+      background: var(--photo), linear-gradient(135deg, #d9f5f1, #e9edff);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .match-card .content {
+      padding: 10px;
+    }
+
+    .match-card strong,
+    .opportunity-card strong,
+    .business-card strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.22;
+    }
+
+    .match-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(155, 18, 56, 0.1);
+      color: var(--wine);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .opportunity-card,
+    .business-card,
+    .event-card,
+    .notification-card,
+    .premium-card,
+    .admin-tile,
+    .form-block {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(209, 149, 28, 0.12);
+      border-radius: 22px;
+      box-shadow: 0 12px 35px rgba(70, 20, 30, 0.08);
+      backdrop-filter: blur(12px);
+    }
+
+    .opportunity-card {
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .post-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--avatar, linear-gradient(135deg, var(--wine), var(--gold)));
+      flex: 0 0 42px;
+      display: grid;
+      place-items: center;
+      color: var(--white);
+      font-weight: 900;
+      border: 2px solid var(--white);
+      box-shadow: 0 4px 12px rgba(24, 33, 47, 0.12);
+    }
+
+    .post-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .post-meta strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .post-meta small {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      color: var(--wine);
+      background: rgba(155, 18, 56, 0.1);
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .pill.coral {
+      background: rgba(200, 70, 88, 0.1);
+      color: #c84658;
+    }
+
+    .pill.blue {
+      background: rgba(196, 138, 28, 0.1);
+      color: #b57d13;
+    }
+
+    .pill.amber {
+      background: rgba(209, 149, 28, 0.1);
+      color: #d1951c;
+    }
+
+    .opportunity-card p,
+    .business-card p,
+    .event-card p,
+    .premium-card p,
+    .notification-card p {
+      color: var(--muted);
+      line-height: 1.45;
+      margin: 8px 0 0;
+      font-size: 13px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: #f0f3f8;
+      color: #4f5d72;
+      font-size: 11px;
+      font-weight: 760;
+    }
+
+    .action-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 40px;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .mini-btn {
+      min-height: 38px;
+      border-radius: 12px;
+      background: #f2f6fb;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 850;
+      border: 1px solid transparent;
+    }
+
+    .mini-btn.primary {
+      background: var(--wine);
+      color: var(--white);
+    }
+
+    .bottom-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 76px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      padding: 8px 10px 12px;
+      background: rgba(255, 255, 255, 0.94);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      z-index: 5;
+    }
+
+    .nav-btn {
+      background: transparent;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 820;
+      min-width: 0;
+    }
+
+    .nav-icon {
+      width: 25px;
+      height: 25px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: inherit;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .nav-btn.active {
+      color: var(--wine);
+    }
+
+    .nav-btn.active .nav-icon {
+      background: rgba(155, 18, 56, 0.1);
+    }
+
+    .form-block {
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 850;
+      color: #364258;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      min-height: 42px;
+      padding: 10px 12px;
+      background: #fbfcff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .field textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .upload-tile {
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      border: 1px dashed #bbc6d8;
+      background: #f7f9fc;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .business-cover {
+      min-height: 178px;
+      margin: -18px -18px 0;
+      background:
+        linear-gradient(180deg, rgba(24, 33, 47, 0), rgba(155, 18, 56, 0.74)),
+        url("https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=900&q=80") center / cover;
+      display: flex;
+      align-items: flex-end;
+      padding: 18px;
+      color: var(--white);
+    }
+
+    .profile-head {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .profile-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--wine), var(--gold));
+      display: grid;
+      place-items: center;
+      color: var(--white);
+      font-size: 28px;
+      font-weight: 950;
+      border: 3px solid rgba(255, 255, 255, 0.86);
+      flex: 0 0 70px;
+    }
+
+    .profile-head h2,
+    .profile-head p {
+      margin: 0;
+    }
+
+    .profile-head h2 {
+      line-height: 1.12;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .stat {
+      min-height: 70px;
+      border-radius: 16px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      padding: 10px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 720;
+    }
+
+    .business-card {
+      padding: 13px;
+      margin-bottom: 10px;
+    }
+
+    .review-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding-top: 12px;
+      margin-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .chat-layout {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100%;
+      background: var(--white);
+    }
+
+    .chat-list {
+      background: var(--soft);
+      padding: 0 18px 96px;
+      overflow-y: auto;
+    }
+
+    .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      color: inherit;
+    }
+
+    .chat-item strong {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .chat-item p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .chat-thread {
+      display: none;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1;
+      background: #f7f9fc;
+    }
+
+    .chat-thread.active {
+      display: flex;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 16px 18px 88px;
+      overflow-y: auto;
+    }
+
+    .bubble {
+      width: fit-content;
+      max-width: 82%;
+      padding: 10px 12px;
+      border-radius: 16px;
+      margin-bottom: 9px;
+      font-size: 13px;
+      line-height: 1.38;
+      background: var(--white);
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .bubble.me {
+      margin-left: auto;
+      background: var(--wine);
+      color: var(--white);
+      border-color: var(--wine);
+    }
+
+    .message-box {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 86px;
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.96);
+      z-index: 4;
+      box-shadow: 0 12px 28px rgba(24, 33, 47, 0.08);
+    }
+
+    .message-box input {
+      flex: 1;
+      border: 0;
+      outline: none;
+      min-width: 0;
+      padding: 0 8px;
+      background: transparent;
+    }
+
+    .map-canvas {
+      height: 310px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+        linear-gradient(135deg, #d6f4ec, #e7ecff 48%, #fff1e6);
+      background-size: 42px 42px, 42px 42px, 100% 100%;
+      border: 1px solid var(--line);
+    }
+
+    .route {
+      position: absolute;
+      left: -20px;
+      right: -20px;
+      height: 52px;
+      top: 124px;
+      transform: rotate(-12deg);
+      background: rgba(255, 255, 255, 0.76);
+      border-top: 1px solid rgba(152, 167, 190, 0.45);
+      border-bottom: 1px solid rgba(152, 167, 190, 0.45);
+    }
+
+    .route.second {
+      top: 52px;
+      transform: rotate(33deg);
+    }
+
+    .pin {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50% 50% 50% 8px;
+      transform: rotate(-45deg);
+      background: var(--pin, var(--wine));
+      color: var(--white);
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(24, 33, 47, 0.18);
+    }
+
+    .pin span {
+      transform: rotate(45deg);
+      font-size: 12px;
+    }
+
+    .pin.active {
+      outline: 4px solid rgba(255, 255, 255, 0.86);
+      box-shadow: 0 0 0 6px rgba(155, 18, 56, 0.18), 0 12px 24px rgba(24, 33, 47, 0.2);
+    }
+
+    .map-sheet {
+      margin-top: -42px;
+      position: relative;
+      z-index: 2;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 18px 28px rgba(24, 33, 47, 0.1);
+    }
+
+    .event-card {
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .event-photo {
+      min-height: 112px;
+      background: var(--event-photo), linear-gradient(135deg, #e7f8f5, #fff1ed);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .event-body {
+      padding: 13px;
+    }
+
+    .calendar-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .day {
+      min-height: 64px;
+      border-radius: 16px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-weight: 850;
+    }
+
+    .day span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    .day.active {
+      background: var(--wine);
+      color: var(--white);
+      border-color: var(--wine);
+    }
+
+    .day.active span {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .notification-card {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .notification-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--coral);
+      margin-top: 5px;
+      flex: 0 0 11px;
+    }
+
+    .referral-hero {
+      border-radius: 22px;
+      padding: 18px;
+      background:
+        linear-gradient(135deg, rgba(155, 18, 56, 0.94), rgba(209, 149, 28, 0.9)),
+        url("https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80") center / cover;
+      color: var(--white);
+      min-height: 196px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .referral-hero h2,
+    .referral-hero p {
+      margin: 0;
+    }
+
+    .invite-code {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      backdrop-filter: blur(8px);
+    }
+
+    .invite-code strong {
+      font-size: 20px;
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 999px;
+      background: #e7ebf2;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 64%;
+      background: linear-gradient(90deg, var(--wine), var(--gold));
+    }
+
+    .premium-card {
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .price {
+      font-size: 30px;
+      font-weight: 950;
+      line-height: 1;
+      margin-top: 10px;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .check-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      color: #3b4659;
+      font-size: 13px;
+      line-height: 1.34;
+    }
+
+    .check-list li::before {
+      content: "✓";
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(155, 18, 56, 0.1);
+      color: var(--wine);
+      font-size: 12px;
+      font-weight: 950;
+      flex: 0 0 20px;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .admin-tile {
+      padding: 12px;
+      min-height: 96px;
+    }
+
+    .admin-tile strong {
+      display: block;
+      font-size: 22px;
+    }
+
+    .admin-tile span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .bar-chart {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      align-items: end;
+      height: 132px;
+      padding: 12px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .bar-chart span {
+      display: block;
+      border-radius: 6px 6px 0 0;
+      background: linear-gradient(180deg, var(--wine), var(--gold));
+      min-height: 28px;
+    }
+
+    .side-panel {
+      min-height: min(844px, calc(100vh - 48px));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .side-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      width: fit-content;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(155, 18, 56, 0.1);
+      color: var(--wine);
+      font-weight: 850;
+      font-size: 12px;
+    }
+
+    .side-panel h1 {
+      font-size: clamp(34px, 4vw, 58px);
+      line-height: 1;
+      margin: 0;
+      letter-spacing: 0;
+      max-width: 700px;
+    }
+
+    .side-panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 650px;
+    }
+
+    .strategy-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .strategy-item {
+      min-height: 128px;
+      border-radius: 20px;
+      border: 1px solid rgba(207, 216, 230, 0.8);
+      background: rgba(255, 255, 255, 0.76);
+      padding: 14px;
+      backdrop-filter: blur(12px);
+    }
+
+    .strategy-item strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .strategy-item span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      display: block;
+    }
+
+    .utility-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .utility-nav .filter-btn {
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .toast {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 88px;
+      background: var(--wine);
+      color: var(--white);
+      border-radius: 30px;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 780;
+      transform: translateY(18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+      z-index: 8;
+      box-shadow: 0 16px 34px rgba(17, 25, 39, 0.28);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 920px) {
+      body {
+        padding: 0;
+        display: block;
+        background: var(--soft);
+      }
+
+      .workspace {
+        display: block;
+        width: 100%;
+      }
+
+      .phone {
+        width: 100%;
+        height: 100dvh;
+        min-height: 100dvh;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .side-panel {
+        display: none;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .screen-scroll {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .hero-photo h1 {
+        font-size: 31px;
+      }
+
+      .action-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-grid,
+      .strategy-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="workspace">
+    <section class="phone" aria-label="Protótipo mobile Conecta">
+      <div class="status-bar">
+        <span>09:41</span>
+        <div class="status-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="app">
+        <!-- Tela de Login -->
+        <section class="screen active" id="login-screen">
+          <div class="hero-photo">
+            <div>
+              <div class="brand-mark"></div>
+              <h1>conecta</h1>
+              <p>Quem oferece encontra quem precisa.</p>
+            </div>
+          </div>
+          <div class="login-panel">
+            <div class="intro-grid">
+              <div class="intro-item">
+                <span class="icon-dot" style="background: var(--wine);">M</span>
+                <strong>Match por nicho, bairro e público</strong>
+                <small>IA local</small>
+              </div>
+              <div class="intro-item">
+                <span class="icon-dot" style="background: var(--coral);">E</span>
+                <strong>Eventos e ativações próximos</strong>
+                <small>Agenda regional</small>
+              </div>
+              <div class="intro-item">
+                <span class="icon-dot" style="background: var(--gold);">R</span>
+                <strong>Reputação após cada parceria</strong>
+                <small>Confiança</small>
+              </div>
+              <div class="intro-item">
+                <span class="icon-dot" style="background: var(--amber);">I</span>
+                <strong>Indicações com visibilidade extra</strong>
+                <small>Gamificação</small>
+              </div>
+            </div>
+
+            <button class="primary-btn" data-screen="feed-screen">Entrar como empresa</button>
+            <div style="height:10px"></div>
+            <button class="secondary-btn" data-screen="register-screen">Cadastrar meu negócio</button>
+            <p style="color: var(--muted); font-size: 12px; line-height: 1.45; margin-top: 14px;">
+              Ideal para academias, cafés, restaurantes, studios, profissionais de saúde, marcas locais,
+              fotógrafos, eventos e creators regionais.
+            </p>
+          </div>
+        </section>
+
+        <!-- Tela de Cadastro -->
+        <section class="screen" id="register-screen">
+          <header class="app-header">
+            <div class="topline">
+              <button class="icon-btn" data-screen="login-screen" aria-label="Voltar">‹</button>
+              <div class="location">
+                <div class="brand-mark"></div>
+                <div>
+                  <h2>Cadastro</h2>
+                  <small>Crie seu perfil empresarial</small>
+                </div>
+              </div>
+            </div>
+          </header>
+          <div class="screen-scroll">
+            <div class="form-block">
+              <div class="field">
+                <label for="business-name">Nome do negócio</label>
+                <input id="business-name" value="Café Aurora" />
+              </div>
+              <div class="field">
+                <label for="category">Categoria</label>
+                <select id="category">
+                  <option>Cafeteria</option>
+                  <option>Academia</option>
+                  <option>Restaurante</option>
+                  <option>Studio</option>
+                  <option>Beach tennis</option>
+                  <option>Fisioterapia</option>
+                  <option>Nutrição</option>
+                  <option>Marca local</option>
+                  <option>Fotografia</option>
+                  <option>Eventos</option>
+                  <option>Influencer regional</option>
+                </select>
+              </div>
+              <div class="button-row">
+                <div class="field" style="flex:1">
+                  <label for="city">Cidade</label>
+                  <input id="city" value="Florianópolis" />
+                </div>
+                <div class="field" style="flex:1">
+                  <label for="district">Bairro</label>
+                  <input id="district" value="Centro" />
+                </div>
+              </div>
+              <div class="field">
+                <label for="description">Descrição</label>
+                <textarea id="description">Cafeteria autoral com brunch, eventos intimistas e público recorrente de profissionais criativos.</textarea>
+              </div>
+              <div class="field">
+                <label for="instagram">Instagram ou site</label>
+                <input id="instagram" value="@cafeaurora" />
+              </div>
+              <div class="field">
+                <label>Fotos do negócio</label>
+                <div class="upload-grid">
+                  <div class="upload-tile">+</div>
+                  <div class="upload-tile">+</div>
+                  <div class="upload-tile">+</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-block">
+              <div class="field">
+                <label for="audience">Tamanho do público</label>
+                <select id="audience">
+                  <option>Até 2 mil seguidores/clientes</option>
+                  <option>2 mil a 10 mil</option>
+                  <option>10 mil a 50 mil</option>
+                  <option>Mais de 50 mil</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Interesses de parceria</label>
+                <div class="tag-row">
+                  <span class="tag">Eventos</span>
+                  <span class="tag">Permuta</span>
+                  <span class="tag">Sampling</span>
+                  <span class="tag">Conteúdo</span>
+                  <span class="tag">Patrocínio</span>
+                </div>
+              </div>
+              <button class="primary-btn" data-screen="feed-screen">Concluir cadastro</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tela Principal (Feed) -->
+        <section class="screen" id="feed-screen">
+          <header class="app-header">
+            <div class="topline">
+              <div class="location">
+                <div class="brand-mark"></div>
+                <div>
+                  <h2>Florianópolis</h2>
+                  <small>Centro e bairros próximos</small>
+                </div>
+              </div>
+              <button class="icon-btn" data-screen="notifications-screen" aria-label="Notificações">•</button>
+            </div>
+            <div class="search">⌕ Buscar parceiros, eventos ou collabs</div>
+            <div class="segmented">
+              <button class="filter-btn active">Oportunidades</button>
+              <button class="filter-btn" data-screen="matches-screen">Matches</button>
+              <button class="filter-btn">Patrocínios</button>
+              <button class="filter-btn">Ativações</button>
+            </div>
+          </header>
+
+          <div class="screen-scroll">
+            <div class="section-title">
+              <h3>Match inteligente</h3>
+              <button class="ghost-btn" data-screen="matches-screen">Ver todos</button>
+            </div>
+            <div class="match-strip">
+              <article class="match-card">
+                <div class="photo" style="--photo:url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=500&q=80')"></div>
+                <div class="content">
+                  <strong>Pulse Fit</strong>
+                  <span class="mini-label">Academia · 1,2 km</span>
+                  <span class="match-score">94% match</span>
+                </div>
+              </article>
+              <article class="match-card">
+                <div class="photo" style="--photo:url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=500&q=80')"></div>
+                <div class="content">
+                  <strong>Brasa Local</strong>
+                  <span class="mini-label">Restaurante · 800 m</span>
+                  <span class="match-score">89% match</span>
+                </div>
+              </article>
+              <article class="match-card">
+                <div class="photo" style="--photo:url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=500&q=80')"></div>
+                <div class="content">
+                  <strong>Viva Eventos</strong>
+                  <span class="mini-label">Eventos · 2 km</span>
+                  <span class="match-score">86% match</span>
+                </div>
+              </article>
+            </div>
+
+            <div class="section-title">
+              <h3>Feed de oportunidades</h3>
+              <span>Hoje</span>
+            </div>
+
+            <article class="opportunity-card">
+              <div class="post-head">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #9b1238, #d1951c)">PF</div>
+                <div class="post-meta">
+                  <strong>Pulse Fit</strong>
+                  <small>Academia · Centro · há 18 min</small>
+                </div>
+                <span class="pill">Evento</span>
+              </div>
+              <strong>Procuro parceiros para a Semana Wellness</strong>
+              <p>Buscamos cafeteria, nutricionista e marca local para uma ativação com degustação, cupons e conteúdo para Instagram.</p>
+              <div class="tag-row">
+                <span class="tag">saúde</span><span class="tag">sampling</span><span class="tag">conteúdo</span>
+              </div>
+              <div class="action-bar">
+                <button class="mini-btn primary" data-screen="chat-screen">Enviar proposta</button>
+                <button class="mini-btn" data-screen="business-profile-screen">Ver perfil</button>
+                <button class="mini-btn">↗</button>
+              </div>
+            </article>
+
+            <article class="opportunity-card">
+              <div class="post-head">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #c84658, #d1951c)">VE</div>
+                <div class="post-meta">
+                  <strong>Viva Eventos</strong>
+                  <small>Organizador · Beira-Mar · há 1 h</small>
+                </div>
+                <span class="pill coral">Patrocínio</span>
+              </div>
+              <strong>Busco patrocinadores para festival de marcas locais</strong>
+              <p>Evento para 900 pessoas, com espaços para food, wellness, fotografia e creators regionais.</p>
+              <div class="tag-row">
+                <span class="tag">marca local</span><span class="tag">festival</span><span class="tag">mídia</span>
+              </div>
+              <div class="action-bar">
+                <button class="mini-btn primary" data-screen="chat-screen">Negociar</button>
+                <button class="mini-btn" data-screen="events-screen">Ver evento</button>
+                <button class="mini-btn">★</button>
+              </div>
+            </article>
+
+            <article class="opportunity-card">
+              <div class="post-head">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #8d2d48, #d1951c)">BT</div>
+                <div class="post-meta">
+                  <strong>Beach Ten Pro</strong>
+                  <small>Beach tennis · Jurerê · ontem</small>
+                </div>
+                <span class="pill blue">Collab</span>
+              </div>
+              <strong>Quero collab com fotógrafo e marca fitness</strong>
+              <p>Torneio regional no sábado com espaço para shooting, brindes e cupons para alunos.</p>
+              <div class="tag-row">
+                <span class="tag">esporte</span><span class="tag">foto</span><span class="tag">influencers</span>
+              </div>
+              <div class="action-bar">
+                <button class="mini-btn primary" data-screen="chat-screen">Tenho interesse</button>
+                <button class="mini-btn" data-screen="map-screen">No mapa</button>
+                <button class="mini-btn">↗</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Tela de Matches -->
+        <section class="screen" id="matches-screen">
+          <header class="app-header">
+            <div class="topline">
+              <button class="icon-btn" data-screen="feed-screen" aria-label="Voltar">‹</button>
+              <div class="location">
+                <div>
+                  <h2>Matches</h2>
+                  <small>Recomendações por localização, nicho e interesses</small>
+                </div>
+              </div>
+            </div>
+            <div class="filters">
+              <button class="filter-btn active">Todos</button>
+              <button class="filter-btn">Saúde</button>
+              <button class="filter-btn">Food</button>
+              <button class="filter-btn">Eventos</button>
+              <button class="filter-btn">Creators</button>
+            </div>
+          </header>
+          <div class="screen-scroll">
+            <article class="business-card">
+              <div class="post-head">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #9b1238, #d1951c)">CF</div>
+                <div class="post-meta">
+                  <strong>Corpo & Fluxo Fisio</strong>
+                  <small>Fisioterapia · 600 m · público parecido</small>
+                </div>
+                <span class="match-score">96%</span>
+              </div>
+              <p>Interesses em comum: eventos wellness, conteúdo educativo e pacotes corporativos.</p>
+              <div class="action-bar">
+                <button class="mini-btn primary" data-screen="chat-screen">Conectar</button>
+                <button class="mini-btn" data-screen="business-profile-screen">Perfil</button>
+                <button class="mini-btn">★</button>
+              </div>
+            </article>
+            <article class="business-card">
+              <div class="post-head">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #c84658, #d1951c)">NL</div>
+                <div class="post-meta">
+                  <strong>Nativa Lab</strong>
+                  <small>Marca local · 1,8 km · ativa em eventos</small>
+                </div>
+                <span class="match-score">91%</span>
+              </div>
+              <p>Boa conexão para kits de boas-vindas, sampling e bundles de lançamento.</p>
+              <div class="action-bar">
+                <button class="mini-btn primary" data-screen="chat-screen">Conectar</button>
+                <button class="mini-btn" data-screen="business-profile-screen">Perfil</button>
+                <button class="mini-btn">★</button>
+              </div>
+            </article>
+            <article class="business-card">
+              <div class="post-head">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #8d2d48, #d1951c)">MC</div>
+                <div class="post-meta">
+                  <strong>Marina Conteúdo</strong>
+                  <small>Influencer regional · 2,4 km · 32 mil seguidores</small>
+                </div>
+                <span class="match-score">88%</span>
+              </div>
+              <p>Potencial para cobertura de eventos, divulgação e collabs com marcas de experiência.</p>
+              <div class="action-bar">
+                <button class="mini-btn primary" data-screen="chat-screen">Conectar</button>
+                <button class="mini-btn" data-screen="business-profile-screen">Perfil</button>
+                <button class="mini-btn">★</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Tela de Perfil do Negócio -->
+        <section class="screen" id="business-profile-screen">
+          <div class="screen-scroll">
+            <button class="icon-btn" data-screen="feed-screen" aria-label="Voltar" style="position:absolute; top:12px; left:12px; z-index:3;">‹</button>
+            <div class="business-cover">
+              <div class="profile-head">
+                <div class="profile-avatar">A</div>
+                <div>
+                  <h2>Café Aurora</h2>
+                  <p>Cafeteria · Centro · @cafeaurora</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat"><strong>4.9</strong><span>confiabilidade</span></div>
+              <div class="stat"><strong>18</strong><span>parcerias</span></div>
+              <div class="stat"><strong>12k</strong><span>público local</span></div>
+            </div>
+
+            <div class="business-card">
+              <strong>Sobre o negócio</strong>
+              <p>Cafeteria autoral com brunch, eventos intimistas e comunidade criativa. Aberta para collabs com saúde, bem-estar, marcas locais e creators.</p>
+              <div class="tag-row">
+                <span class="tag">brunch</span><span class="tag">eventos</span><span class="tag">conteúdo</span><span class="tag">permuta</span>
+              </div>
+            </div>
+
+            <div class="business-card">
+              <strong>Badges e níveis</strong>
+              <div class="tag-row">
+                <span class="pill">Parceiro verificado</span>
+                <span class="pill amber">Top indicado</span>
+                <span class="pill blue">Nível Pro</span>
+              </div>
+            </div>
+
+            <div class="business-card">
+              <strong>Últimas avaliações</strong>
+              <div class="review-row">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #9b1238, #d1951c)">PF</div>
+                <div>
+                  <strong>Pulse Fit · 5.0</strong>
+                  <p>Equipe organizada, entrega rápida e excelente retorno de mídia local.</p>
+                </div>
+              </div>
+              <div class="review-row">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #8d2d48, #d1951c)">MC</div>
+                <div>
+                  <strong>Marina Conteúdo · 4.8</strong>
+                  <p>Collab com bom briefing, visual bonito e público muito engajado.</p>
+                </div>
+              </div>
+            </div>
+
+            <button class="primary-btn" data-screen="chat-screen">Iniciar conversa</button>
+          </div>
+        </section>
+
+        <!-- Tela de Chat -->
+        <section class="screen" id="chat-screen">
+          <header class="app-header">
+            <div class="topline">
+              <div class="location">
+                <div class="brand-mark"></div>
+                <div>
+                  <h2>Chat</h2>
+                  <small>Negociação entre empresas</small>
+                </div>
+              </div>
+              <button class="icon-btn" data-screen="feed-screen" aria-label="Fechar">×</button>
+            </div>
+          </header>
+
+          <div class="chat-thread active">
+            <div class="messages" id="messages">
+              <div class="bubble">Oi! Vimos seu interesse na Semana Wellness. Vocês conseguem fazer uma degustação no sábado?</div>
+              <div class="bubble me">Conseguimos sim. Podemos levar cold brew, voucher e montar uma mesa de sampling.</div>
+              <div class="bubble">Perfeito. Em troca, oferecemos mídia no perfil, espaço no evento e mailing pós-evento.</div>
+              <div class="bubble me">Fechado. Vou mandar uma proposta com quantidades e contrapartidas.</div>
+            </div>
+            <div class="message-box">
+              <input id="chat-input" placeholder="Escreva sobre permuta, patrocínio ou evento" />
+              <button class="icon-btn" id="send-message" aria-label="Enviar">›</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tela de Mapa -->
+        <section class="screen" id="map-screen">
+          <header class="app-header">
+            <div class="topline">
+              <div class="location">
+                <div class="brand-mark"></div>
+                <div>
+                  <h2>Mapa local</h2>
+                  <small>Negócios e eventos próximos</small>
+                </div>
+              </div>
+              <button class="icon-btn" data-screen="notifications-screen" aria-label="Alertas">•</button>
+            </div>
+            <div class="filters">
+              <button class="filter-btn active">Próximos</button>
+              <button class="filter-btn">Eventos</button>
+              <button class="filter-btn">Food</button>
+              <button class="filter-btn">Saúde</button>
+            </div>
+          </header>
+          <div class="screen-scroll">
+            <div class="map-canvas" aria-label="Mapa ilustrativo de negócios próximos">
+              <div class="route"></div>
+              <div class="route second"></div>
+              <button class="pin active" style="left: 52%; top: 46%; --pin: var(--wine);" aria-label="Café Aurora"><span>CA</span></button>
+              <button class="pin" style="left: 22%; top: 28%; --pin: var(--gold);" aria-label="Pulse Fit"><span>PF</span></button>
+              <button class="pin" style="left: 70%; top: 22%; --pin: var(--coral);" aria-label="Viva Eventos"><span>VE</span></button>
+              <button class="pin" style="left: 36%; top: 68%; --pin: var(--amber);" aria-label="Nativa Lab"><span>NL</span></button>
+            </div>
+            <div class="map-sheet">
+              <div class="post-head" style="margin-bottom:0">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #9b1238, #d1951c)">CA</div>
+                <div class="post-meta">
+                  <strong>Café Aurora</strong>
+                  <small>Você está aqui · 4 oportunidades em 2 km</small>
+                </div>
+                <span class="pill">Centro</span>
+              </div>
+            </div>
+
+            <div class="section-title">
+              <h3>Próximos de você</h3>
+              <span>até 3 km</span>
+            </div>
+            <article class="business-card">
+              <div class="post-head">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #9b1238, #d1951c)">PF</div>
+                <div class="post-meta"><strong>Pulse Fit</strong><small>1,2 km · evento wellness</small></div>
+                <span class="pill">94%</span>
+              </div>
+            </article>
+            <article class="business-card">
+              <div class="post-head">
+                <div class="avatar" style="--avatar:linear-gradient(135deg, #c84658, #d1951c)">VE</div>
+                <div class="post-meta"><strong>Viva Eventos</strong><small>2 km · festival local</small></div>
+                <span class="pill coral">Hoje</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Tela de Eventos -->
+        <section class="screen" id="events-screen">
+          <header class="app-header">
+            <div class="topline">
+              <div class="location">
+                <div class="brand-mark"></div>
+                <div>
+                  <h2>Eventos</h2>
+                  <small>Calendário de ativações regionais</small>
+                </div>
+              </div>
+              <button class="icon-btn" data-screen="map-screen" aria-label="Mapa">⌖</button>
+            </div>
+          </header>
+          <div class="screen-scroll">
+            <div class="calendar-strip">
+              <div class="day"><span>SEG</span>26</div>
+              <div class="day active"><span>TER</span>27</div>
+              <div class="day"><span>QUA</span>28</div>
+              <div class="day"><span>QUI</span>29</div>
+              <div class="day"><span>SEX</span>30</div>
+            </div>
+
+            <article class="event-card">
+              <div class="event-photo" style="--event-photo:url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80')"></div>
+              <div class="event-body">
+                <span class="pill coral">Vagas para patrocinadores</span>
+                <h3 style="margin:10px 0 0; font-size:17px;">Festival de Marcas Locais</h3>
+                <p>Beira-Mar · 900 pessoas esperadas · food, wellness, música e creators.</p>
+                <div class="action-bar">
+                  <button class="mini-btn primary" data-screen="chat-screen">Participar</button>
+                  <button class="mini-btn" data-screen="map-screen">Como chegar</button>
+                  <button class="mini-btn">★</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="event-card">
+              <div class="event-photo" style="--event-photo:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=900&q=80')"></div>
+              <div class="event-body">
+                <span class="pill">Aberto para collabs</span>
+                <h3 style="margin:10px 0 0; font-size:17px;">Manhã Wellness & Networking</h3>
+                <p>Centro · vagas para nutrição, fisioterapia, fotografia e sampling.</p>
+                <div class="action-bar">
+                  <button class="mini-btn primary" data-screen="chat-screen">Aplicar</button>
+                  <button class="mini-btn">Salvar</button>
+                  <button class="mini-btn">↗</button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Tela de Notificações -->
+        <section class="screen" id="notifications-screen">
+          <header class="app-header">
+            <div class="topline">
+              <button class="icon-btn" data-screen="feed-screen" aria-label="Voltar">‹</button>
+              <div class="location">
+                <div>
+                  <h2>Notificações</h2>
+                  <small>Novas conexões, propostas e badges</small>
+                </div>
+              </div>
+            </div>
+          </header>
+          <div class="screen-scroll">
+            <article class="notification-card">
+              <span class="notification-dot"></span>
+              <div>
+                <strong>Pulse Fit aceitou conversar</strong>
+                <p>Abra o chat para alinhar permuta, mídia e logística do evento.</p>
+              </div>
+            </article>
+            <article class="notification-card">
+              <span class="notification-dot" style="background: var(--gold);"></span>
+              <div>
+                <strong>Novo match 96%</strong>
+                <p>Corpo & Fluxo Fisio combina com seu público e interesses de parceria.</p>
+              </div>
+            </article>
+            <article class="notification-card">
+              <span class="notification-dot" style="background: var(--amber);"></span>
+              <div>
+                <strong>Selo Top Indicado desbloqueado</strong>
+                <p>Você ativou 3 parceiros usando seu código CONECTA-AURORA.</p>
+              </div>
+            </article>
+            <article class="notification-card">
+              <span class="notification-dot" style="background: var(--wine);"></span>
+              <div>
+                <strong>Evento próximo amanhã</strong>
+                <p>Festival de Marcas Locais ainda tem espaços para cafeteria e conteúdo.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Tela de Indicações -->
+        <section class="screen" id="referral-screen">
+          <header class="app-header">
+            <div class="topline">
+              <div class="location">
+                <div class="brand-mark"></div>
+                <div>
+                  <h2>Indicações</h2>
+                  <small>Convide parceiros e ganhe visibilidade</small>
+                </div>
+              </div>
+              <button class="icon-btn" data-screen="premium-screen" aria-label="Premium">★</button>
+            </div>
+          </header>
+          <div class="screen-scroll">
+            <div class="referral-hero">
+              <div>
+                <h2>Seu ecossistema cresce com você</h2>
+                <p style="margin-top:8px;">Cada parceiro ativo indicado aumenta destaque, badges e benefícios premium.</p>
+              </div>
+              <div class="invite-code">
+                <div>
+                  <small style="font-weight:800; opacity:.8;">Código de convite</small>
+                  <strong>CONECTA-AURORA</strong>
+                </div>
+                <button class="icon-btn" id="copy-code" aria-label="Copiar código">⧉</button>
+              </div>
+            </div>
+
+            <div class="business-card" style="margin-top:12px;">
+              <strong>Progresso do mês</strong>
+              <p>3 de 5 parceiros ativos. Faltam 2 para liberar destaque regional por 7 dias.</p>
+              <div class="progress"><span></span></div>
+            </div>
+
+            <div class="business-card">
+              <strong>Benefícios desbloqueáveis</strong>
+              <ul class="check-list">
+                <li>Destaque no feed de oportunidades por bairro.</li>
+                <li>Selo especial de negócio conector.</li>
+                <li>Mais alcance em eventos e busca local.</li>
+                <li>Créditos premium para publicar oportunidades.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tela Premium -->
+        <section class="screen" id="premium-screen">
+          <header class="app-header">
+            <div class="topline">
+              <button class="icon-btn" data-screen="referral-screen" aria-label="Voltar">‹</button>
+              <div class="location">
+                <div>
+                  <h2>Premium</h2>
+                  <small>Mais visibilidade e inteligência comercial</small>
+                </div>
+              </div>
+            </div>
+          </header>
+          <div class="screen-scroll">
+            <article class="premium-card" style="background: linear-gradient(135deg, #2b1b1f, #7d0f2d); color: white;">
+              <span class="pill amber">Plano Pro Local</span>
+              <div class="price">R$ 79<span style="font-size:14px;">/mês</span></div>
+              <p style="color: rgba(255,255,255,.78);">Para negócios que fazem parcerias com frequência e querem aparecer primeiro.</p>
+              <ul class="check-list">
+                <li style="color:white;">Destaque regional em feed, mapa e eventos.</li>
+                <li style="color:white;">Insights de match, público e categorias quentes.</li>
+                <li style="color:white;">Publicações extras de oportunidade.</li>
+                <li style="color:white;">Selo verificado e suporte prioritário.</li>
+              </ul>
+              <button class="primary-btn">Assinar Premium</button>
+            </article>
+
+            <article class="premium-card">
+              <strong>Créditos de destaque</strong>
+              <p>Compre boosts avulsos para lançamentos, eventos sazonais e ações comerciais de curto prazo.</p>
+              <div class="tag-row">
+                <span class="tag">R$ 19 por boost</span>
+                <span class="tag">pacotes regionais</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Tela Admin -->
+        <section class="screen" id="admin-screen">
+          <header class="app-header">
+            <div class="topline">
+              <button class="icon-btn" data-screen="feed-screen" aria-label="Voltar">‹</button>
+              <div class="location">
+                <div>
+                  <h2>Admin web</h2>
+                  <small>Operação regional e moderação</small>
+                </div>
+              </div>
+            </div>
+          </header>
+          <div class="screen-scroll">
+            <div class="admin-grid">
+              <div class="admin-tile"><strong>428</strong><span>empresas ativas</span></div>
+              <div class="admin-tile"><strong>71</strong><span>oportunidades/mês</span></div>
+              <div class="admin-tile"><strong>38%</strong><span>matches viram chat</span></div>
+              <div class="admin-tile"><strong>4.7</strong><span>reputação média</span></div>
+            </div>
+            <div class="section-title">
+              <h3>Crescimento por semana</h3>
+              <span>cidade piloto</span>
+            </div>
+            <div class="bar-chart" aria-label="Crescimento semanal">
+              <span style="height:38%"></span>
+              <span style="height:52%"></span>
+              <span style="height:44%"></span>
+              <span style="height:67%"></span>
+              <span style="height:76%"></span>
+              <span style="height:92%"></span>
+            </div>
+            <article class="business-card" style="margin-top:12px;">
+              <strong>Ferramentas do painel</strong>
+              <ul class="check-list">
+                <li>Aprovação e verificação de empresas.</li>
+                <li>Moderação de posts, chats denunciados e avaliações.</li>
+                <li>Gestão de cidades, categorias, eventos e planos.</li>
+                <li>Relatórios de receita, retenção, indicações e conversões.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Navegação Inferior -->
+        <nav class="bottom-nav" aria-label="Navegação principal">
+          <button class="nav-btn active" data-screen="feed-screen"><span class="nav-icon">⌂</span><span>Feed</span></button>
+          <button class="nav-btn" data-screen="map-screen"><span class="nav-icon">⌖</span><span>Mapa</span></button>
+          <button class="nav-btn" data-screen="events-screen"><span class="nav-icon">□</span><span>Eventos</span></button>
+          <button class="nav-btn" data-screen="chat-screen"><span class="nav-icon">✉</span><span>Chat</span></button>
+          <button class="nav-btn" data-screen="business-profile-screen"><span class="nav-icon">C</span><span>Perfil</span></button>
+        </nav>
+
+        <div class="toast" id="toast" role="status" aria-live="polite">Ação concluída.</div>
+      </div>
+    </section>
+
+    <aside class="side-panel" aria-label="Resumo estratégico do Conecta">
+      <span class="side-kicker">Protótipo mobile + estratégia B2B regional</span>
+      <h1>Conecta aproxima pequenos negócios para parcerias reais.</h1>
+      <p>
+        A proposta combina feed de oportunidades, match inteligente, reputação, mapa local,
+        calendário de eventos, chat comercial e gamificação por indicação. O resultado é um
+        ecossistema de colaboração, não apenas um diretório de empresas.
+      </p>
+
+      <div class="strategy-grid">
+        <div class="strategy-item">
+          <strong>Monetização</strong>
+          <span>Freemium, plano Pro Local, boosts de visibilidade, patrocínio de eventos, verificação e pacotes para redes regionais.</span>
+        </div>
+        <div class="strategy-item">
+          <strong>Crescimento regional</strong>
+          <span>Lançamento cidade por cidade, embaixadores locais, parcerias com associações comerciais e loops de indicação.</span>
+        </div>
+        <div class="strategy-item">
+          <strong>Stack sugerida</strong>
+          <span>React Native/Expo, Next.js admin, PostgreSQL + PostGIS, Redis, storage S3, push FCM/APNs e pagamentos Stripe ou Mercado Pago.</span>
+        </div>
+        <div class="strategy-item">
+          <strong>Admin web</strong>
+          <span>Moderação, verificação, métricas de match, gestão de eventos, planos, cidades e reputação.</span>
+        </div>
+      </div>
+
+      <div class="utility-nav">
+        <button class="filter-btn" data-screen="notifications-screen">Notificações</button>
+        <button class="filter-btn" data-screen="referral-screen">Indicação</button>
+        <button class="filter-btn" data-screen="premium-screen">Premium</button>
+        <button class="filter-btn" data-screen="admin-screen">Admin web</button>
+        <button class="filter-btn" data-screen="register-screen">Cadastro</button>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const screens = document.querySelectorAll(".screen");
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const screenButtons = document.querySelectorAll("[data-screen]");
+    const toast = document.querySelector("#toast");
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1900);
+    }
+
+    function activateScreen(screenId) {
+      screens.forEach((screen) => {
+        screen.classList.toggle("active", screen.id === screenId);
+      });
+
+      navButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.screen === screenId);
+      });
+
+      const active = document.getElementById(screenId);
+      const scroll = active?.querySelector(".screen-scroll, .messages, .chat-list");
+      if (scroll) scroll.scrollTop = 0;
+    }
+
+    screenButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.screen;
+        if (target) activateScreen(target);
+      });
+    });
+
+    document.querySelectorAll(".filter-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        const group = button.parentElement;
+        group.querySelectorAll(".filter-btn").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+      });
+    });
+
+    document.querySelectorAll(".mini-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!button.dataset.screen) showToast("Oportunidade salva para revisar depois.");
+      });
+    });
+
+    document.querySelectorAll(".pin").forEach((pin) => {
+      pin.addEventListener("click", () => {
+        document.querySelectorAll(".pin").forEach((item) => item.classList.remove("active"));
+        pin.classList.add("active");
+        showToast(`${pin.getAttribute("aria-label")} selecionado no mapa.`);
+      });
+    });
+
+    document.querySelector("#send-message").addEventListener("click", () => {
+      const input = document.querySelector("#chat-input");
+      const text = input.value.trim();
+      if (!text) return;
+      const bubble = document.createElement("div");
+      bubble.className = "bubble me";
+      bubble.textContent = text;
+      document.querySelector("#messages").appendChild(bubble);
+      input.value = "";
+      bubble.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+
+    document.querySelector("#chat-input").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        document.querySelector("#send-message").click();
+      }
+    });
+
+    document.querySelector("#copy-code").addEventListener("click", async () => {
+      const code = "CONECTA-AURORA";
+      try {
+        await navigator.clipboard.writeText(code);
+        showToast("Código copiado: CONECTA-AURORA");
+      } catch {
+        showToast("Código: CONECTA-AURORA");
+      }
+    });
+  </script>
+</body>
+</html>
